@@ -1,5 +1,9 @@
 # PAWpy — Planning Analytics Workspace REST API Wrapper
 
+[![PyPI version](https://img.shields.io/pypi/v/PAWpy.svg)](https://pypi.org/project/PAWpy/)
+[![Python versions](https://img.shields.io/pypi/pyversions/PAWpy.svg)](https://pypi.org/project/PAWpy/)
+[![License: MIT](https://img.shields.io/pypi/l/PAWpy.svg)](https://github.com/bluestarleo/PAWpy/blob/main/LICENSE)
+
 A TM1py-inspired Python wrapper for the PAW REST API.
 
 ## Install
