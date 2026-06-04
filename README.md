@@ -12,6 +12,22 @@ uv run python -m pytest     # 14 offline tests (no live server needed)
 Requires Python ≥3.11 and `requests`. The URL-builder calls (`paw.ui.*`,
 `*.get_embed_url`) make no network request and work without a live PAW server.
 
+## Releasing
+
+Publishing is automated by `.github/workflows/publish.yml` via PyPI
+[Trusted Publishing](https://docs.pypi.org/trusted-publishers/) (OIDC — no API
+token stored). To cut a release:
+
+1. Bump `version` in `pyproject.toml` and add a `CHANGELOG.md` entry.
+2. One-time on PyPI: add a Trusted Publisher for project `PAWpy` →
+   `bluestarleo/PAWpy`, workflow `publish.yml`, environment `pypi`.
+3. Tag and push:
+   ```bash
+   git tag v0.1.0 && git push origin v0.1.0
+   ```
+The workflow runs the tests (3.11–3.13), builds, checks the tag matches the
+package version, and publishes the sdist + wheel to PyPI.
+
 ## Architecture
 
 ```
