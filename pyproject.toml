@@ -1,0 +1,62 @@
+[project]
+name = "PAWpy"
+version = "0.1.0"
+description = "A TM1py-inspired Python wrapper for the IBM Planning Analytics Workspace (PAW) REST API."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Leo Zhu", email = "zulianxi@hotmail.com" }]
+maintainers = [{ name = "Leo Zhu", email = "zulianxi@hotmail.com" }]
+keywords = [
+    "ibm",
+    "planning-analytics",
+    "paw",
+    "tm1",
+    "tm1py",
+    "rest-api",
+    "olap",
+    "fpa",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Office/Business :: Financial",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "requests>=2.31",
+]
+
+[project.optional-dependencies]
+pandas = ["pandas>=2.0"]
+dev = ["pytest>=8.0", "responses>=0.25"]
+
+[project.urls]
+Homepage = "https://github.com/bluestarleo/PAWpy"
+Repository = "https://github.com/bluestarleo/PAWpy"
+Issues = "https://github.com/bluestarleo/PAWpy/issues"
+Changelog = "https://github.com/bluestarleo/PAWpy/blob/main/CHANGELOG.md"
+Documentation = "https://www.ibm.com/docs/en/planning-analytics/2.1.0?topic=workspace-planning-analytics-rest-api"
+
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = [
+    "PAWpy",
+    "PAWpy.Services",
+    "PAWpy.Objects",
+    "PAWpy.Exceptions",
+    "PAWpy.Utils",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
