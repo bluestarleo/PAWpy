@@ -6,6 +6,18 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+- PAW build-version awareness: `PAWpy/version_requirements.py` declares the
+  minimum PAW build per API group (`MIN_PAW_VERSION`); each service exposes an
+  `API_GROUP`; `PAWService` gains `paw_version`, `requires()`, `supports()`,
+  `assert_supported()`, and a best-effort `detect_paw_version()`. New
+  `PAWVersionError`.
+- `coverage/COVERAGE.md` — endpoint coverage matrix (source of truth for what
+  PAWpy wraps) with per-group minimum-PAW-build and `Since PAW` columns.
+- `/update-paw-coverage` maintenance skill + `diff_endpoints.py`: re-pull the PAW
+  endpoint inventory each release and diff it against the coverage matrix to flag
+  new/removed endpoints.
+
 ## [0.1.0] - 2026-06-03
 
 ### Added

@@ -16,6 +16,9 @@ from PAWpy.Services.RestService import RestService
 
 
 class UIService(ObjectService):
+    # PAW API group (see PAWpy.version_requirements / coverage/COVERAGE.md).
+    API_GROUP = "ui"
+
     def __init__(self, rest: RestService):
         super().__init__(rest)
 

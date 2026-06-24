@@ -97,7 +97,7 @@ with PAWService(
     host="paw.mycompany.com",
     auth_mode="cam",
     namespace="LDAP",
-    username="leo",
+    username="my-username",
     password="secret",
 ) as paw:
     ...
@@ -127,6 +127,43 @@ with PAWService(
 | *(no equivalent)* | `ContentService` |
 | *(no equivalent)* | `AdminService` |
 | *(no equivalent)* | `UIService` |
+
+## Versioning against PAW builds
+
+The PAW REST API is still incomplete and grows with each IBM release, so PAWpy is
+versioned against **two** axes: its own semver (`PAWpy.__version__`) and the
+**minimum PAW build** each API group requires. Each service declares its
+`API_GROUP`; the per-group minimums live in `PAWpy/version_requirements.py`
+(`MIN_PAW_VERSION`) and are mirrored in `coverage/COVERAGE.md`.
+
+```python
+paw = PAWService(host="paw.acme.com", auth_mode="oauth", ..., paw_version="2.1.21")
+
+paw.requires("content")          # -> "2.1.21"  (min PAW build for Content Services)
+paw.supports("content")          # -> True / False against the known paw_version
+paw.assert_supported("content")  # raises PAWVersionError if the build is too old
+paw.detect_paw_version()         # best-effort probe (overridable path/field)
+```
+
+When `paw_version` is unknown, gating is a **no-op** — PAWpy never blocks a call
+solely because it couldn't determine the version; the server still rejects
+genuinely-unsupported requests. The coverage matrix and its per-group version
+table are reconciled on each PAW release by the `/update-paw-coverage` skill.
+
+## Coverage matrix & release tracking
+
+`coverage/COVERAGE.md` is the source of truth for which PAW endpoints PAWpy wraps
+and which PAW build each needs. On every PAW release, the `/update-paw-coverage`
+skill re-pulls IBM's endpoint inventory (Postman collection export or the
+published API references) and diffs it against the matrix:
+
+```bash
+.venv/Scripts/python.exe .claude/skills/update-paw-coverage/scripts/diff_endpoints.py \
+    --postman paw_collection.json      # or: --endpoints endpoints.txt
+```
+
+It flags endpoints PAW now exposes that PAWpy doesn't yet wrap (exit code 1), so
+the wrapper can track IBM's cadence instead of drifting.
 
 ## Roadmap (aligned with IBM's "future releases" promise)
 

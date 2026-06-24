@@ -19,6 +19,9 @@ _VIEW_TYPES = {"view", "cube-viewer", "cubeviewer"}
 
 
 class ViewService(ObjectService):
+    # PAW API group (see PAWpy.version_requirements / coverage/COVERAGE.md).
+    API_GROUP = "content"
+
     def __init__(self, rest: RestService, content: ContentService, ui: UIService):
         super().__init__(rest)
         self._content = content

@@ -19,6 +19,9 @@ DEFAULT_ADMIN_BASE = "/api/v1/admin"
 
 
 class AdminService(ObjectService):
+    # PAW API group (see PAWpy.version_requirements / coverage/COVERAGE.md).
+    API_GROUP = "admin"
+
     def __init__(self, rest: RestService, admin_base: str = DEFAULT_ADMIN_BASE):
         super().__init__(rest)
         self._base = "/" + admin_base.strip("/")

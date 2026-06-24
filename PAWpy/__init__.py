@@ -14,6 +14,13 @@ from PAWpy.Exceptions.Exceptions import (
     PAWConfigException,
     PAWNotFoundException,
     PAWTimeoutException,
+    PAWVersionError,
+)
+from PAWpy.version_requirements import (
+    BASELINE_PAW_VERSION,
+    MIN_PAW_VERSION,
+    min_version_for,
+    is_supported,
 )
 
 __version__ = "0.1.0"
@@ -28,4 +35,9 @@ __all__ = [
     "PAWConfigException",
     "PAWNotFoundException",
     "PAWTimeoutException",
+    "PAWVersionError",
+    "BASELINE_PAW_VERSION",
+    "MIN_PAW_VERSION",
+    "min_version_for",
+    "is_supported",
 ]
