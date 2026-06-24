@@ -26,6 +26,9 @@ PROXY_PREFIX = "/api/v0/tm1"
 
 
 class TM1ProxyService(ObjectService):
+    # PAW API group (see PAWpy.version_requirements / coverage/COVERAGE.md).
+    API_GROUP = "tm1-proxy"
+
     def __init__(self, rest: RestService, server: str):
         super().__init__(rest)
         if not server:

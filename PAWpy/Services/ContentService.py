@@ -29,6 +29,9 @@ DEFAULT_CONTENT_BASE = "/pacontent/v1"
 
 
 class ContentService(ObjectService):
+    # PAW API group (see PAWpy.version_requirements / coverage/COVERAGE.md).
+    API_GROUP = "content"
+
     def __init__(self, rest: RestService, content_base: str = DEFAULT_CONTENT_BASE):
         super().__init__(rest)
         self._base = "/" + content_base.strip("/")

@@ -6,9 +6,20 @@ Run with:  uv run pytest   (or:  python -m pytest)
 
 import pytest
 
-from PAWpy import PAWService, PAWConfigException
+from PAWpy import PAWService, PAWConfigException, PAWVersionError
 from PAWpy.Services.RestService import RestService
+from PAWpy.Services.ContentService import ContentService
+from PAWpy.Services.AdminService import AdminService
+from PAWpy.Services.UIService import UIService
+from PAWpy.Services.TM1ProxyService import TM1ProxyService
 from PAWpy.Utils.Utils import odata_query, encode_path_twice, odata_value_list
+from PAWpy.version_requirements import (
+    parse_version,
+    version_meets,
+    min_version_for,
+    is_supported,
+    BASELINE_PAW_VERSION,
+)
 
 
 def make_paw():
@@ -103,6 +114,71 @@ def test_tm1_requires_database():
     paw = make_paw()
     with pytest.raises(ValueError):
         paw.tm1()  # no default database set
+
+
+# --------------------------- version requirements ------------------------ #
+def test_parse_version_tolerant():
+    assert parse_version("2.1.21") == (2, 1, 21)
+    assert parse_version("v2.0") == (2, 0)
+    assert parse_version("2.1.21-rc1") == (2, 1, 21)
+    assert parse_version("") == ()
+    assert parse_version("unknown") == ()
+
+
+def test_version_meets():
+    assert version_meets("2.1.21", "2.1.21") is True
+    assert version_meets("2.1.22", "2.1.21") is True
+    assert version_meets("2.1.20", "2.1.21") is False
+    assert version_meets("2.2", "2.1.21") is True
+    # unknown version never spuriously meets a requirement
+    assert version_meets(None, "2.0.0") is False
+
+
+def test_min_version_for_known_and_default():
+    assert min_version_for("content") == "2.1.21"
+    assert min_version_for("nonexistent-group") == BASELINE_PAW_VERSION
+
+
+def test_is_supported_unknown_version_is_permissive():
+    # Unknown server version -> PAWpy does not block.
+    assert is_supported("content", None) is True
+    assert is_supported("content", "2.1.20") is False
+    assert is_supported("content", "2.1.21") is True
+
+
+def test_services_declare_api_group():
+    assert ContentService.API_GROUP == "content"
+    assert AdminService.API_GROUP == "admin"
+    assert UIService.API_GROUP == "ui"
+    assert TM1ProxyService.API_GROUP == "tm1-proxy"
+
+
+def test_paw_service_version_gating():
+    paw = make_paw()
+    # No version set -> permissive.
+    assert paw.paw_version is None
+    assert paw.supports("content") is True
+    paw.assert_supported("content")  # no-op
+
+    assert paw.requires("content") == "2.1.21"
+
+    # Too-old version -> supports() False and assert raises.
+    paw.paw_version = "2.1.20"
+    assert paw.supports("content") is False
+    with pytest.raises(PAWVersionError):
+        paw.assert_supported("content")
+
+    # New enough -> supported again.
+    paw.paw_version = "2.1.21"
+    assert paw.supports("content") is True
+    paw.assert_supported("content")
+
+
+def test_paw_version_constructor_arg():
+    paw = PAWService(host="paw.test.local", auth_mode="session",
+                     csrf_token="x", connect=False, paw_version="2.1.21")
+    assert paw.paw_version == "2.1.21"
+    assert paw.supports("content") is True
 
 
 # --------------------------- config validation --------------------------- #

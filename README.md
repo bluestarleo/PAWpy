@@ -97,7 +97,7 @@ with PAWService(
     host="paw.mycompany.com",
     auth_mode="cam",
     namespace="LDAP",
-    username="leo",
+    username="my-username",
     password="secret",
 ) as paw:
     ...
@@ -127,6 +127,37 @@ with PAWService(
 | *(no equivalent)* | `ContentService` |
 | *(no equivalent)* | `AdminService` |
 | *(no equivalent)* | `UIService` |
+
+## Versioning against PAW builds
+
+The PAW REST API is still incomplete and grows with each IBM release, so PAWpy is
+versioned against **two** axes: its own semver (`PAWpy.__version__`) and the
+**minimum PAW build** each API group requires. Each service declares its
+`API_GROUP`; the per-group minimums live in `PAWpy/version_requirements.py`
+(`MIN_PAW_VERSION`) and are mirrored in `coverage/COVERAGE.md`.
+
+```python
+paw = PAWService(host="paw.acme.com", auth_mode="oauth", ..., paw_version="2.1.21")
+
+paw.requires("content")          # -> "2.1.21"  (min PAW build for Content Services)
+paw.supports("content")          # -> True / False against the known paw_version
+paw.assert_supported("content")  # raises PAWVersionError if the build is too old
+paw.detect_paw_version()         # best-effort probe (overridable path/field)
+```
+
+When `paw_version` is unknown, gating is a **no-op** — PAWpy never blocks a call
+solely because it couldn't determine the version; the server still rejects
+genuinely-unsupported requests. The coverage matrix and its per-group version
+table are reconciled on each PAW release as part of a local maintenance workflow.
+
+## Coverage matrix & release tracking
+
+`coverage/COVERAGE.md` is the source of truth for which PAW endpoints PAWpy wraps
+and which PAW build each needs. Because the PAW REST API is still growing, the
+matrix is reconciled on each PAW release: IBM's endpoint inventory (a Postman
+collection export or the published API references) is re-pulled and diffed
+against the matrix to flag endpoints PAW now exposes that PAWpy doesn't yet wrap,
+so the wrapper tracks IBM's cadence instead of drifting.
 
 ## Roadmap (aligned with IBM's "future releases" promise)
 

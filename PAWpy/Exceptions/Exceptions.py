@@ -24,6 +24,23 @@ class PAWAuthenticationException(PAWException):
     """Raised when login / token acquisition fails."""
 
 
+class PAWVersionError(PAWException):
+    """Raised when the connected PAW build is older than an API group requires.
+
+    Carries the API group, the minimum PAW version it needs, and the detected
+    server version so callers can decide whether to degrade gracefully.
+    """
+
+    def __init__(self, api_group: str, required: str, detected: Optional[str]):
+        self.api_group = api_group
+        self.required = required
+        self.detected = detected
+        super().__init__(
+            f"PAW API group '{api_group}' requires PAW >= {required}, "
+            f"but the connected server is {detected or 'an unknown/older version'}."
+        )
+
+
 class PAWTimeoutException(PAWException):
     """Raised when a request exceeds the configured timeout."""
 
