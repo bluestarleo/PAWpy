@@ -148,22 +148,16 @@ paw.detect_paw_version()         # best-effort probe (overridable path/field)
 When `paw_version` is unknown, gating is a **no-op** — PAWpy never blocks a call
 solely because it couldn't determine the version; the server still rejects
 genuinely-unsupported requests. The coverage matrix and its per-group version
-table are reconciled on each PAW release by the `/update-paw-coverage` skill.
+table are reconciled on each PAW release as part of a local maintenance workflow.
 
 ## Coverage matrix & release tracking
 
 `coverage/COVERAGE.md` is the source of truth for which PAW endpoints PAWpy wraps
-and which PAW build each needs. On every PAW release, the `/update-paw-coverage`
-skill re-pulls IBM's endpoint inventory (Postman collection export or the
-published API references) and diffs it against the matrix:
-
-```bash
-.venv/Scripts/python.exe .claude/skills/update-paw-coverage/scripts/diff_endpoints.py \
-    --postman paw_collection.json      # or: --endpoints endpoints.txt
-```
-
-It flags endpoints PAW now exposes that PAWpy doesn't yet wrap (exit code 1), so
-the wrapper can track IBM's cadence instead of drifting.
+and which PAW build each needs. Because the PAW REST API is still growing, the
+matrix is reconciled on each PAW release: IBM's endpoint inventory (a Postman
+collection export or the published API references) is re-pulled and diffed
+against the matrix to flag endpoints PAW now exposes that PAWpy doesn't yet wrap,
+so the wrapper tracks IBM's cadence instead of drifting.
 
 ## Roadmap (aligned with IBM's "future releases" promise)
 

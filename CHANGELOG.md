@@ -13,10 +13,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   `assert_supported()`, and a best-effort `detect_paw_version()`. New
   `PAWVersionError`.
 - `coverage/COVERAGE.md` — endpoint coverage matrix (source of truth for what
-  PAWpy wraps) with per-group minimum-PAW-build and `Since PAW` columns.
-- `/update-paw-coverage` maintenance skill + `diff_endpoints.py`: re-pull the PAW
-  endpoint inventory each release and diff it against the coverage matrix to flag
-  new/removed endpoints.
+  PAWpy wraps) with per-group minimum-PAW-build and `Since PAW` columns, reconciled
+  on each PAW release against IBM's endpoint inventory to flag endpoints PAWpy
+  doesn't yet wrap.
 
 ## [0.1.0] - 2026-06-03
 

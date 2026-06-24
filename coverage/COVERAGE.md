@@ -1,15 +1,13 @@
 # PAWpy Endpoint Coverage Matrix
 
 > **This file is the single source of truth for what PAWpy implements.**
-> It is both human-readable and machine-parsed by
-> `.claude/skills/update-paw-coverage/scripts/diff_endpoints.py`, which diffs the
-> rows below against the latest PAW Postman collection / API reference on every
-> PAW release. **Keep the table format intact** (leading `|`, five columns) or the
-> diff parser will skip rows.
+> It is both human-readable and machine-parsed by the local release-tracking
+> workflow, which diffs the rows below against the latest PAW Postman collection /
+> API reference on every PAW release. **Keep the method and path as the first two
+> columns** of each table or the diff parser will skip rows.
 
 - **PAWpy version:** 0.1.0
 - **Last reconciled against PAW:** 2026-06-23 (PA 2.1.x API references)
-- **Maintenance skill:** `/update-paw-coverage`
 
 PAWpy is versioned against **two** axes: its own semver (`PAWpy.__version__`) and
 the **minimum PAW build** each API group needs. The per-group minimums below are
