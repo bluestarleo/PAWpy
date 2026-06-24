@@ -10,7 +10,7 @@ A TM1py-inspired Python wrapper for the PAW REST API.
 
 ```bash
 uv sync --extra dev         # installs PAWpy + pytest
-uv run python -m pytest     # 14 offline tests (no live server needed)
+uv run python -m pytest     # 21 offline tests (no live server needed)
 ```
 
 Requires Python ≥3.11 and `requests`. The URL-builder calls (`paw.ui.*`,

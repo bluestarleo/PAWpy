@@ -6,7 +6,7 @@
 > API reference on every PAW release. **Keep the method and path as the first two
 > columns** of each table or the diff parser will skip rows.
 
-- **PAWpy version:** 0.1.0
+- **PAWpy version:** 0.2.0
 - **Last reconciled against PAW:** 2026-06-23 (PA 2.1.x API references)
 
 PAWpy is versioned against **two** axes: its own semver (`PAWpy.__version__`) and
