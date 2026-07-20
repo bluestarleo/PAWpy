@@ -86,14 +86,14 @@ with PAWService(
     client_secret="my-client-secret",
     token_url="https://idp.mycompany.com/oauth2/token",  # required for oauth
     scope="paw",                    # optional
-    database="Global FPA",          # optional default TM1 database
+    database="Planning Sample",          # optional default TM1 database
 ) as paw:
 
     # List books in a folder (returns Asset objects)
-    books = paw.books.get_all("/shared/FP&A")
+    books = paw.books.get_all("/shared/Finance")
 
     # Get embed URL for an iframe (no HTTP call)
-    url = paw.books.get_embed_url("/shared/FP&A/Monthly Report")
+    url = paw.books.get_embed_url("/shared/Finance/Monthly Report")
 
     # List registered TM1 servers
     servers = paw.admin.get_tm1_servers()
@@ -104,11 +104,11 @@ with PAWService(
     users  = paw.user_groups.get_users()
 
     # TM1 proxy call (MDX via PAW auth) — returns the raw cellset JSON
-    tm1 = paw.tm1("Global FPA")
+    tm1 = paw.tm1("Planning Sample")
     data = tm1.execute_mdx("SELECT {[Account].[Revenue]} ON 0 FROM [Revenue Cube]")
 
     # Embed URL generation (no HTTP call)
-    embed = paw.ui.cube_viewer_url("Global FPA", "Revenue Cube", view="Monthly View")
+    embed = paw.ui.cube_viewer_url("Planning Sample", "plan_BudgetPlan", view="Budget Input")
 ```
 
 ### CAM (headless on-prem — recommended for scripts)

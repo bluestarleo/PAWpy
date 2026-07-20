@@ -6,11 +6,11 @@ sub-service through it::
     with PAWService(host="paw.acme.com", auth_mode="oauth",
                     client_id="id", client_secret="secret",
                     token_url="https://idp/token") as paw:
-        books   = paw.books.get_all("/shared/FP&A")
-        url     = paw.books.get_embed_url("/shared/FP&A/Monthly Report")
+        books   = paw.books.get_all("/shared/Finance")
+        url     = paw.books.get_embed_url("/shared/Finance/Monthly Report")
         servers = paw.admin.get_tm1_servers()
-        data    = paw.tm1("Global FPA").execute_mdx("SELECT ...")
-        embed   = paw.ui.cube_viewer_url("Global FPA", "Revenue Cube", "Monthly View")
+        data    = paw.tm1("Planning Sample").execute_mdx("SELECT ...")
+        embed   = paw.ui.cube_viewer_url("Planning Sample", "plan_BudgetPlan", "Budget Input")
 
 All keyword arguments are forwarded to :class:`RestService`, which performs
 authentication on construction (unless ``connect=False``).

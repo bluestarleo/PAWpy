@@ -6,8 +6,8 @@ readme = "README.md"
 requires-python = ">=3.11"
 license = "MIT"
 license-files = ["LICENSE"]
-authors = [{ name = "Leo Zhu", email = "zulianxi@hotmail.com" }]
-maintainers = [{ name = "Leo Zhu", email = "zulianxi@hotmail.com" }]
+authors = [{ name = "PAWpy Maintainers", email = "opensource@example.com" }]
+maintainers = [{ name = "PAWpy Maintainers", email = "opensource@example.com" }]
 keywords = [
     "ibm",
     "planning-analytics",

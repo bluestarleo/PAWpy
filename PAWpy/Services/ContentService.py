@@ -46,7 +46,7 @@ class ContentService(ObjectService):
         return Asset(resp.json())
 
     def get_by_path(self, path: str, expand_content: bool = False) -> Asset:
-        """Fetch a single asset by its content-store path (e.g. ``/shared/FP&A``)."""
+        """Fetch a single asset by its content-store path (e.g. ``/shared/Finance``)."""
         encoded = encode_path_twice(path)
         params = odata_query(expand="content") if expand_content else None
         resp = self._rest.GET(f"{self._base}/Assets(path='{encoded}')", params=params)

@@ -107,10 +107,10 @@ def test_odata_value_list_handles_both_shapes():
 # --------------------------- TM1 proxy paths ----------------------------- #
 def test_tm1_proxy_path():
     paw = make_paw()
-    tm1 = paw.tm1("Global FPA")
+    tm1 = paw.tm1("Planning Sample")
     # exercise the private path builder via build_url for assertion
     full = paw.rest.build_url(tm1._path("Cubes"))
-    assert full == "https://paw.test.local/api/v0/tm1/Global FPA/api/v1/Cubes"
+    assert full == "https://paw.test.local/api/v0/tm1/Planning Sample/api/v1/Cubes"
 
 
 def test_tm1_requires_database():
@@ -123,14 +123,14 @@ def test_tm1_proxy_v1_base():
     # PAW 2.1.21+/3.1.8+ exposes the proxy under /api/v1/tm1 instead of /api/v0/tm1.
     paw = PAWService(host="paw.test.local", auth_mode="session",
                      csrf_token="x", connect=False, tm1_proxy_base=PROXY_PREFIX_V1)
-    tm1 = paw.tm1("Global FPA")
+    tm1 = paw.tm1("Planning Sample")
     full = paw.rest.build_url(tm1._path("Cubes"))
-    assert full == "https://paw.test.local/api/v1/tm1/Global FPA/api/v1/Cubes"
+    assert full == "https://paw.test.local/api/v1/tm1/Planning Sample/api/v1/Cubes"
 
 
 def test_tm1_proxy_all_verbs_available():
     paw = make_paw()
-    tm1 = paw.tm1("Global FPA")
+    tm1 = paw.tm1("Planning Sample")
     for verb in ("get", "post", "patch", "put", "delete"):
         assert callable(getattr(tm1, verb))
 
@@ -215,7 +215,7 @@ def test_content_v1_base_override():
 def test_content_v1_path_encoding():
     # Root folders pass through unchanged; nested paths are encoded once.
     assert ContentV1Service._enc("shared") == "shared"
-    assert ContentV1Service._enc("shared/FP&A") == "shared%2FFP%26A"
+    assert ContentV1Service._enc("shared/R&D") == "shared%2FR%26D"
 
 
 def test_paw_service_version_gating():
