@@ -40,8 +40,8 @@ MIN_PAW_VERSION: Dict[str, str] = {
     "tm1-proxy":    BASELINE_PAW_VERSION,  # /api/v0/tm1/<db>/api/v1 proxy (legacy path)
     "admin":        BASELINE_PAW_VERSION,  # /api/v1/admin
     "content":      "2.1.21",              # /pacontent/v1 Content Services API  # UNVERIFIED — confirm vs IBM release notes
-    "tm1-proxy-v1": "2.1.21",              # /api/v1/tm1/<db>/api/v1 proxy (OAuth-era; per IBM-affiliated PA Postman collection)
-    "content-v1":   "2.1.21",              # /api/v1/content assets/users/groups ("new in 2.1.21 & 3.1.8" per the same collection)
+    "tm1-proxy-v1": "2.1.21",              # /api/v1/tm1/<db>/api/v1 proxy — CONFIRMED: IBM Docs + IBM Community announcement (REST API introduced 2.1.21/3.1.8)
+    "content-v1":   "2.1.21",              # /api/v1/content assets/users/groups — CONFIRMED: same sources; collection folder "new in 2.1.21 & 3.1.8"
 }
 
 # IBM ships PAW on two release lines at once (e.g. "new in 2.1.21 & 3.1.8"), so

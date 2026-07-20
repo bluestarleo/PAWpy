@@ -54,6 +54,8 @@ Thumbs.db
 # Claude Code / local maintenance skills (kept private, not shared)
 .claude/
 skills/
+# Local maintenance artifact: PAW endpoint coverage matrix (kept private, like the skill that maintains it)
+coverage/
 
 # Secrets / env
 .env
