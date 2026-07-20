@@ -56,15 +56,26 @@ they vary across PAW builds (`/pacontent/v1` vs `/api/v1/content`).
 
 | Mode | How it works |
 |------|--------------|
-| `oauth` | Client-credentials grant against `token_url` → `Authorization: Bearer` |
-| `cam` | CAM namespace login via `POST /login` → `x-csrf-token` |
+| `oauth` | Client-credentials grant against an IdP `token_url` → `Authorization: Bearer` (see caveat below) |
+| `cam` | CAM namespace login via `POST /login` → `x-csrf-token` — the proven headless mode for on-prem PAW |
 | `native` | TM1 native username/password login via `POST /login` → `x-csrf-token` |
 | `passport` | Cognos CAM passport (`camid`) via `POST /login` |
 | `session` | Inject an existing `csrf_token` / `session_cookie` (dev/test) |
 
+> **On-prem OAuth caveat** (per IBM Docs, "Configuring authorized applications
+> (OAuth)"): PAW's built-in OAuth (Administration → Integrations tile,
+> PAW 2.1.21+/3.1.8+) supports **only the interactive authorization-code flow**
+> (scope `v0userContext`) — *"client credentials (not interactive) flows are
+> not supported"* against PAW's own `/oauth2/token`. Use `oauth` mode only
+> where an external IdP issues bearer tokens your PAW deployment accepts. For
+> **headless/scripted** access to on-prem PAW, use `cam` mode with directory
+> credentials (PAW shares the CAM directory with TM1, so TM1 service
+> credentials typically work). Authorization-code + refresh-token support is
+> on the roadmap.
+
 ## Usage
 
-### OAuth (Recommended)
+### OAuth (IdP-issued tokens — see caveat above)
 ```python
 from PAWpy import PAWService
 
@@ -100,7 +111,7 @@ with PAWService(
     embed = paw.ui.cube_viewer_url("Global FPA", "Revenue Cube", view="Monthly View")
 ```
 
-### Legacy CAM
+### CAM (headless on-prem — recommended for scripts)
 ```python
 with PAWService(
     host="paw.mycompany.com",
@@ -179,6 +190,7 @@ entries in `CHANGELOG.md` and Roadmap items below.
 - [ ] `ViewService` — PAW view CRUD
 - [ ] `EmbedTokenService` — generate scoped embed tokens
 - [ ] `MCPService` — PAW MCP endpoint integration
-- [ ] Token refresh / OAuth expiry handling
+- [ ] OAuth authorization-code + refresh-token flow — the only OAuth on-prem
+      PAW supports (client-credentials is rejected per IBM Docs)
 - [ ] Async support (`aiohttp`)
 - [ ] Pydantic models for Books, Assets, Servers

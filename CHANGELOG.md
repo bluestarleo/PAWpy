@@ -6,6 +6,16 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+- README auth guidance corrected per IBM Docs and live validation: on-prem
+  PAW's built-in OAuth supports only the interactive authorization-code flow
+  (scope `v0userContext`) — client-credentials is not accepted by PAW's own
+  `/oauth2/token`, so `oauth` mode applies to IdP-issued tokens only. `cam`
+  mode is now documented as the recommended headless path for on-prem PAW
+  (verified against a live 2.0.x deployment: login, `/pacontent/v1` content
+  and the `/api/v0/tm1` proxy all work; `/api/v1/*` 404s on pre-2.1.21
+  builds). Roadmap item updated to authorization-code + refresh-token flow.
+
 ## [0.4.0] - 2026-07-20
 
 ### Added
