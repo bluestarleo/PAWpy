@@ -42,7 +42,8 @@ PAWService                  ← top-level entry point (mirrors TM1py's TM1Servic
 ├── ViewService             ← views over ContentService
 ├── AdminService            ← /api/v1/admin  (servers, users, groups)
 ├── UIService               ← URL builder for /ui?type=… embed endpoints
-└── TM1ProxyService         ← /api/v0/tm1/<db>/api/v1/…  (TM1 REST via PAW auth)
+└── TM1ProxyService         ← /api/v0/tm1/<db>/api/v1/…  (TM1 REST via PAW auth;
+                              pass tm1_proxy_base="/api/v1/tm1" on PAW 2.1.21+/3.1.8+)
 ```
 
 All base paths (`content_base`, `admin_base`) are constructor-overridable, since
@@ -161,8 +162,12 @@ so the wrapper tracks IBM's cadence instead of drifting.
 
 ## Roadmap (aligned with IBM's "future releases" promise)
 
+- [ ] Content API v1 (`/api/v1/content`, PAW 2.1.21+/3.1.8+) — new-style assets
+      incl. content retrieval, permissions, bulk copy/move/delete/permissions,
+      asset types (endpoints recorded in `coverage/COVERAGE.md` as `planned`)
+- [ ] `UserGroupService` — user/group management (endpoints now documented:
+      `/api/v1/content/users|groups`)
 - [ ] `ViewService` — PAW view CRUD
-- [ ] `UserGroupService` — full user/group management
 - [ ] `EmbedTokenService` — generate scoped embed tokens
 - [ ] `MCPService` — PAW MCP endpoint integration
 - [ ] Token refresh / OAuth expiry handling

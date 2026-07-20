@@ -24,7 +24,7 @@ from PAWpy.Services.AdminService import AdminService, DEFAULT_ADMIN_BASE
 from PAWpy.Services.BookService import BookService
 from PAWpy.Services.ContentService import ContentService, DEFAULT_CONTENT_BASE
 from PAWpy.Services.RestService import RestService
-from PAWpy.Services.TM1ProxyService import TM1ProxyService
+from PAWpy.Services.TM1ProxyService import PROXY_PREFIX, TM1ProxyService
 from PAWpy.Services.UIService import UIService
 from PAWpy.Services.ViewService import ViewService
 from PAWpy.version_requirements import (
@@ -42,6 +42,7 @@ class PAWService:
         database: str = None,
         content_base: str = DEFAULT_CONTENT_BASE,
         admin_base: str = DEFAULT_ADMIN_BASE,
+        tm1_proxy_base: str = PROXY_PREFIX,
         paw_version: Optional[str] = None,
         **rest_kwargs,
     ):
@@ -51,6 +52,10 @@ class PAWService:
             with no argument.
         :param content_base: base path of the content services API.
         :param admin_base: base path of the admin API.
+        :param tm1_proxy_base: base path of PAW's TM1 REST proxy. Defaults to the
+            legacy ``/api/v0/tm1``; pass
+            :data:`~PAWpy.Services.TM1ProxyService.PROXY_PREFIX_V1`
+            (``/api/v1/tm1``) on PAW 2.1.21+ / 3.1.8+ (the OAuth-era API).
         :param paw_version: the connected PAW build version (e.g. ``"2.1.21"``).
             Optional — set it (or call :meth:`detect_paw_version`) to enable
             :meth:`supports` / :meth:`assert_supported` version gating. When
@@ -60,6 +65,7 @@ class PAWService:
             client_id, port, ssl, verify, timeout, tenant_id, …).
         """
         self._default_database = database
+        self._tm1_proxy_base = tm1_proxy_base
         self._paw_version = paw_version
         self._rest = RestService(host=host, **rest_kwargs)
 
@@ -87,8 +93,20 @@ class PAWService:
                 "No TM1 database specified and no default 'database' was set on PAWService"
             )
         if db not in self._tm1_cache:
-            self._tm1_cache[db] = TM1ProxyService(self._rest, db)
+            self._tm1_cache[db] = TM1ProxyService(self._rest, db, proxy_base=self._tm1_proxy_base)
         return self._tm1_cache[db]
+
+    # ------------------------------------------------------------------ #
+    # Instance-level probes (OAuth-era API; PAW 2.1.21+ / 3.1.8+ documents
+    # these, availability on older builds is unverified)
+    # ------------------------------------------------------------------ #
+    def ping(self) -> str:
+        """``GET /api/v1/Ping`` — liveness probe; returns the response text."""
+        return self._rest.GET("/api/v1/Ping").text
+
+    def health(self) -> Dict:
+        """``GET /api/v1/health`` — component health report as parsed JSON."""
+        return self._rest.GET("/api/v1/health").json()
 
     # ------------------------------------------------------------------ #
     # PAW build-version awareness
@@ -123,9 +141,12 @@ class PAWService:
 
     def requires(self, api_group: str) -> str:
         """Minimum PAW build required for *api_group* (``"content"``, ``"admin"``,
-        ``"ui"``, ``"auth"``, ``"tm1-proxy"``). Mirrors a service's ``API_GROUP``.
+        ``"ui"``, ``"auth"``, ``"tm1-proxy"``, ``"tm1-proxy-v1"``,
+        ``"content-v1"``). Mirrors a service's ``API_GROUP``. When
+        :attr:`paw_version` is known, the minimum for its release line is
+        returned (IBM ships features to 2.x and 3.x at different builds).
         """
-        return _min_version_for(api_group)
+        return _min_version_for(api_group, self._paw_version)
 
     def supports(self, api_group: str) -> bool:
         """True if the known :attr:`paw_version` satisfies *api_group*'s minimum.

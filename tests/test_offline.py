@@ -11,13 +11,14 @@ from PAWpy.Services.RestService import RestService
 from PAWpy.Services.ContentService import ContentService
 from PAWpy.Services.AdminService import AdminService
 from PAWpy.Services.UIService import UIService
-from PAWpy.Services.TM1ProxyService import TM1ProxyService
+from PAWpy.Services.TM1ProxyService import TM1ProxyService, PROXY_PREFIX_V1
 from PAWpy.Utils.Utils import odata_query, encode_path_twice, odata_value_list
 from PAWpy.version_requirements import (
     parse_version,
     version_meets,
     min_version_for,
     is_supported,
+    assert_supported,
     BASELINE_PAW_VERSION,
 )
 
@@ -116,6 +117,22 @@ def test_tm1_requires_database():
         paw.tm1()  # no default database set
 
 
+def test_tm1_proxy_v1_base():
+    # PAW 2.1.21+/3.1.8+ exposes the proxy under /api/v1/tm1 instead of /api/v0/tm1.
+    paw = PAWService(host="paw.test.local", auth_mode="session",
+                     csrf_token="x", connect=False, tm1_proxy_base=PROXY_PREFIX_V1)
+    tm1 = paw.tm1("Global FPA")
+    full = paw.rest.build_url(tm1._path("Cubes"))
+    assert full == "https://paw.test.local/api/v1/tm1/Global FPA/api/v1/Cubes"
+
+
+def test_tm1_proxy_all_verbs_available():
+    paw = make_paw()
+    tm1 = paw.tm1("Global FPA")
+    for verb in ("get", "post", "patch", "put", "delete"):
+        assert callable(getattr(tm1, verb))
+
+
 # --------------------------- version requirements ------------------------ #
 def test_parse_version_tolerant():
     assert parse_version("2.1.21") == (2, 1, 21)
@@ -144,6 +161,23 @@ def test_is_supported_unknown_version_is_permissive():
     assert is_supported("content", None) is True
     assert is_supported("content", "2.1.20") is False
     assert is_supported("content", "2.1.21") is True
+
+
+def test_min_version_per_release_line():
+    # IBM ships to two release lines at once ("new in 2.1.21 & 3.1.8"): a 3.x
+    # build below 3.1.8 must NOT pass just because it exceeds 2.1.21.
+    assert min_version_for("content-v1") == "2.1.21"
+    assert min_version_for("content-v1", "2.1.22") == "2.1.21"
+    assert min_version_for("content-v1", "3.1.0") == "3.1.8"
+
+    assert is_supported("content-v1", "2.1.20") is False
+    assert is_supported("content-v1", "2.1.21") is True
+    assert is_supported("content-v1", "3.1.7") is False
+    assert is_supported("content-v1", "3.1.8") is True
+
+    with pytest.raises(PAWVersionError):
+        assert_supported("tm1-proxy-v1", "3.1.0")
+    assert_supported("tm1-proxy-v1", "3.1.8")  # no-op
 
 
 def test_services_declare_api_group():

@@ -35,6 +35,12 @@ class AdminService(ObjectService):
         """List the TM1 / database servers registered with this PAW instance."""
         return odata_value_list(self.get("servers"))
 
+    def get_databases(self) -> List[Dict[str, Any]]:
+        """List TM1 databases via ``GET /api/v1/tm1/Servers`` — the OAuth-era
+        (PAW 2.1.21+ / 3.1.8+) successor to :meth:`get_tm1_servers`. Note this
+        endpoint lives outside ``admin_base``."""
+        return odata_value_list(self._rest.GET("/api/v1/tm1/Servers").json())
+
     def get_users(self) -> List[Dict[str, Any]]:
         return odata_value_list(self.get("users"))
 

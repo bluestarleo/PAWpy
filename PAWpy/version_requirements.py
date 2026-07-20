@@ -35,11 +35,23 @@ BASELINE_PAW_VERSION = "2.0.0"
 # Minimum PAW build version per API group. Keep the keys in sync with the `API`
 # column in coverage/COVERAGE.md and the `API_GROUP` attribute on each service.
 MIN_PAW_VERSION: Dict[str, str] = {
-    "auth":      BASELINE_PAW_VERSION,  # POST /login, /logout, OAuth token grant
-    "ui":        BASELINE_PAW_VERSION,  # /ui embed-URL builder
-    "tm1-proxy": BASELINE_PAW_VERSION,  # /api/v0/tm1/<db>/api/v1 proxy
-    "admin":     BASELINE_PAW_VERSION,  # /api/v1/admin
-    "content":   "2.1.21",              # /pacontent/v1 Content Services API  # UNVERIFIED — confirm vs IBM release notes
+    "auth":         BASELINE_PAW_VERSION,  # POST /login, /logout, OAuth token grant
+    "ui":           BASELINE_PAW_VERSION,  # /ui embed-URL builder
+    "tm1-proxy":    BASELINE_PAW_VERSION,  # /api/v0/tm1/<db>/api/v1 proxy (legacy path)
+    "admin":        BASELINE_PAW_VERSION,  # /api/v1/admin
+    "content":      "2.1.21",              # /pacontent/v1 Content Services API  # UNVERIFIED — confirm vs IBM release notes
+    "tm1-proxy-v1": "2.1.21",              # /api/v1/tm1/<db>/api/v1 proxy (OAuth-era; per IBM-affiliated PA Postman collection)
+    "content-v1":   "2.1.21",              # /api/v1/content assets/users/groups ("new in 2.1.21 & 3.1.8" per the same collection)
+}
+
+# IBM ships PAW on two release lines at once (e.g. "new in 2.1.21 & 3.1.8"), so
+# a single minimum can mis-gate the other line: 3.1.0 is "newer" than 2.1.21
+# but *lacks* features introduced at 2.1.21/3.1.8. For groups listed here, the
+# effective minimum is chosen by the major version of the server's build; other
+# lines/groups fall back to MIN_PAW_VERSION.
+MIN_PAW_VERSION_BY_LINE: Dict[str, Dict[int, str]] = {
+    "tm1-proxy-v1": {2: "2.1.21", 3: "3.1.8"},
+    "content-v1":   {2: "2.1.21", 3: "3.1.8"},
 }
 
 
@@ -76,8 +88,18 @@ def version_meets(version: Optional[str], minimum: str) -> bool:
     return pv >= parse_version(minimum)
 
 
-def min_version_for(api_group: str) -> str:
-    """Minimum PAW build required for *api_group* (falls back to the baseline)."""
+def min_version_for(api_group: str, paw_version: Optional[str] = None) -> str:
+    """Minimum PAW build required for *api_group* (falls back to the baseline).
+
+    When *paw_version* is given and the group has per-release-line minimums
+    (``MIN_PAW_VERSION_BY_LINE``), the minimum for that version's line is
+    returned — e.g. ``min_version_for("content-v1", "3.1.0")`` -> ``"3.1.8"``.
+    """
+    lines = MIN_PAW_VERSION_BY_LINE.get(api_group)
+    if lines and paw_version:
+        parsed = parse_version(paw_version)
+        if parsed and parsed[0] in lines:
+            return lines[parsed[0]]
     return MIN_PAW_VERSION.get(api_group, BASELINE_PAW_VERSION)
 
 
@@ -90,7 +112,7 @@ def is_supported(api_group: str, paw_version: Optional[str]) -> bool:
     """
     if not paw_version:
         return True
-    return version_meets(paw_version, min_version_for(api_group))
+    return version_meets(paw_version, min_version_for(api_group, paw_version))
 
 
 def assert_supported(api_group: str, paw_version: Optional[str]) -> None:
@@ -99,4 +121,4 @@ def assert_supported(api_group: str, paw_version: Optional[str]) -> None:
     No-op when *paw_version* is unknown (see :func:`is_supported`).
     """
     if paw_version and not is_supported(api_group, paw_version):
-        raise PAWVersionError(api_group, min_version_for(api_group), paw_version)
+        raise PAWVersionError(api_group, min_version_for(api_group, paw_version), paw_version)
