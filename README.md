@@ -37,7 +37,10 @@ package version, and publishes the sdist + wheel to PyPI.
 ```
 PAWService                  ← top-level entry point (mirrors TM1py's TM1Service)
 ├── RestService             ← session + auth + GET/POST/PATCH/PUT/DELETE core
-├── ContentService          ← /pacontent/v1/Assets  (OData folders / books / assets)
+├── ContentService          ← /pacontent/v1/Assets  (legacy OData folders / books / assets)
+├── ContentV1Service        ← /api/v1/content  (OAuth-era assets, permissions,
+│                             bulk ops, asset types — PAW 2.1.21+/3.1.8+)
+├── UserGroupService        ← /api/v1/content/users|groups  (PAW 2.1.21+/3.1.8+)
 ├── BookService             ← books (type=book/dashboard) over ContentService
 ├── ViewService             ← views over ContentService
 ├── AdminService            ← /api/v1/admin  (servers, users, groups)
@@ -83,6 +86,11 @@ with PAWService(
 
     # List registered TM1 servers
     servers = paw.admin.get_tm1_servers()
+
+    # OAuth-era content API (PAW 2.1.21+/3.1.8+): permissions, bulk ops, users
+    assets = paw.content_v1.list_children("shared")
+    perms  = paw.content_v1.get_effective_permissions(assets[0].id)
+    users  = paw.user_groups.get_users()
 
     # TM1 proxy call (MDX via PAW auth) — returns the raw cellset JSON
     tm1 = paw.tm1("Global FPA")
@@ -163,11 +171,11 @@ entries in `CHANGELOG.md` and Roadmap items below.
 
 ## Roadmap (aligned with IBM's "future releases" promise)
 
-- [ ] Content API v1 (`/api/v1/content`, PAW 2.1.21+/3.1.8+) — new-style assets
-      incl. content retrieval, permissions, bulk copy/move/delete/permissions,
-      asset types (endpoints recorded in `coverage/COVERAGE.md` as `planned`)
-- [ ] `UserGroupService` — user/group management (endpoints now documented:
-      `/api/v1/content/users|groups`)
+- [x] Content API v1 (`/api/v1/content`, PAW 2.1.21+/3.1.8+) — `ContentV1Service`:
+      assets incl. content retrieval, permissions (get/set/effective),
+      bulk copy/move/delete/permissions, asset types
+- [x] `UserGroupService` — PAW users/groups reads (`/api/v1/content/users|groups`);
+      write endpoints not yet documented by IBM
 - [ ] `ViewService` — PAW view CRUD
 - [ ] `EmbedTokenService` — generate scoped embed tokens
 - [ ] `MCPService` — PAW MCP endpoint integration

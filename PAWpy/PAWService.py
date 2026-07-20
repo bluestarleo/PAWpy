@@ -23,9 +23,11 @@ from typing import Dict, Optional
 from PAWpy.Services.AdminService import AdminService, DEFAULT_ADMIN_BASE
 from PAWpy.Services.BookService import BookService
 from PAWpy.Services.ContentService import ContentService, DEFAULT_CONTENT_BASE
+from PAWpy.Services.ContentV1Service import ContentV1Service, DEFAULT_CONTENT_V1_BASE
 from PAWpy.Services.RestService import RestService
 from PAWpy.Services.TM1ProxyService import PROXY_PREFIX, TM1ProxyService
 from PAWpy.Services.UIService import UIService
+from PAWpy.Services.UserGroupService import UserGroupService
 from PAWpy.Services.ViewService import ViewService
 from PAWpy.version_requirements import (
     assert_supported as _assert_supported,
@@ -41,6 +43,7 @@ class PAWService:
         *,
         database: str = None,
         content_base: str = DEFAULT_CONTENT_BASE,
+        content_v1_base: str = DEFAULT_CONTENT_V1_BASE,
         admin_base: str = DEFAULT_ADMIN_BASE,
         tm1_proxy_base: str = PROXY_PREFIX,
         paw_version: Optional[str] = None,
@@ -50,7 +53,11 @@ class PAWService:
         :param host: PAW hostname (no scheme), e.g. ``paw.acme.com``.
         :param database: default TM1 database/server for :meth:`tm1` when called
             with no argument.
-        :param content_base: base path of the content services API.
+        :param content_base: base path of the legacy content services API
+            (``/pacontent/v1``).
+        :param content_v1_base: base path of the OAuth-era content API
+            (``/api/v1/content``, PAW 2.1.21+/3.1.8+ — :attr:`content_v1` /
+            :attr:`user_groups`).
         :param admin_base: base path of the admin API.
         :param tm1_proxy_base: base path of PAW's TM1 REST proxy. Defaults to the
             legacy ``/api/v0/tm1``; pass
@@ -71,6 +78,8 @@ class PAWService:
 
         # Core services
         self.content = ContentService(self._rest, content_base=content_base)
+        self.content_v1 = ContentV1Service(self._rest, content_base=content_v1_base)
+        self.user_groups = UserGroupService(self._rest, content_base=content_v1_base)
         self.ui = UIService(self._rest)
         self.books = BookService(self._rest, self.content, self.ui)
         self.views = ViewService(self._rest, self.content, self.ui)

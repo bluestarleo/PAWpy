@@ -12,6 +12,8 @@ from PAWpy.Services.ContentService import ContentService
 from PAWpy.Services.AdminService import AdminService
 from PAWpy.Services.UIService import UIService
 from PAWpy.Services.TM1ProxyService import TM1ProxyService, PROXY_PREFIX_V1
+from PAWpy.Services.ContentV1Service import ContentV1Service
+from PAWpy.Services.UserGroupService import UserGroupService
 from PAWpy.Utils.Utils import odata_query, encode_path_twice, odata_value_list
 from PAWpy.version_requirements import (
     parse_version,
@@ -185,6 +187,35 @@ def test_services_declare_api_group():
     assert AdminService.API_GROUP == "admin"
     assert UIService.API_GROUP == "ui"
     assert TM1ProxyService.API_GROUP == "tm1-proxy"
+    assert ContentV1Service.API_GROUP == "content-v1"
+    assert UserGroupService.API_GROUP == "content-v1"
+
+
+def test_content_v1_and_user_groups_wired():
+    paw = make_paw()
+    assert isinstance(paw.content_v1, ContentV1Service)
+    assert isinstance(paw.user_groups, UserGroupService)
+    # Both share the OAuth-era base and its version gate.
+    assert paw.content_v1._base == "/api/v1/content"
+    assert paw.user_groups._base == "/api/v1/content"
+    paw.paw_version = "3.1.7"
+    assert paw.supports("content-v1") is False
+    paw.paw_version = "3.1.8"
+    assert paw.supports("content-v1") is True
+
+
+def test_content_v1_base_override():
+    paw = PAWService(host="paw.test.local", auth_mode="session",
+                     csrf_token="x", connect=False,
+                     content_v1_base="/custom/content")
+    assert paw.content_v1._base == "/custom/content"
+    assert paw.user_groups._base == "/custom/content"
+
+
+def test_content_v1_path_encoding():
+    # Root folders pass through unchanged; nested paths are encoded once.
+    assert ContentV1Service._enc("shared") == "shared"
+    assert ContentV1Service._enc("shared/FP&A") == "shared%2FFP%26A"
 
 
 def test_paw_service_version_gating():
