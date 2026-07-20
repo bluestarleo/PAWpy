@@ -6,7 +6,13 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-07-20
+
 ### Changed
+- Repository anonymized for open-source distribution: examples now use IBM's
+  public Planning Sample database objects; author/maintainer metadata is
+  `PAWpy Maintainers <opensource@example.com>`; LICENSE copyright holder is
+  "PAWpy contributors". No functional changes.
 - README auth guidance corrected per IBM Docs and live validation: on-prem
   PAW's built-in OAuth supports only the interactive authorization-code flow
   (scope `v0userContext`) — client-credentials is not accepted by PAW's own
@@ -82,7 +88,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Typed exception hierarchy (`PAWException` and subclasses).
 - 14 offline tests covering URL building, OData/path encoding, and config validation.
 
-[Unreleased]: https://github.com/bluestarleo/PAWpy/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/bluestarleo/PAWpy/compare/v0.4.1...HEAD
+[0.4.1]: https://github.com/bluestarleo/PAWpy/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/bluestarleo/PAWpy/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/bluestarleo/PAWpy/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/bluestarleo/PAWpy/compare/v0.1.0...v0.2.0

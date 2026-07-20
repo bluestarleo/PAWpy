@@ -1,6 +1,6 @@
 [project]
 name = "PAWpy"
-version = "0.4.0"
+version = "0.4.1"
 description = "A TM1py-inspired Python wrapper for the IBM Planning Analytics Workspace (PAW) REST API."
 readme = "README.md"
 requires-python = ">=3.11"
