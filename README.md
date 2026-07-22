@@ -189,7 +189,15 @@ entries in `CHANGELOG.md` and Roadmap items below.
       write endpoints not yet documented by IBM
 - [ ] `ViewService` — PAW view CRUD
 - [ ] `EmbedTokenService` — generate scoped embed tokens
-- [ ] `MCPService` — PAW MCP endpoint integration
+- [ ] `MCPService` — PAW MCP endpoint integration. **Scope decision needed when
+      PAW 2.1.22 ships**: IBM consolidates all Planning Analytics Agent MCP
+      tools under a unified `/ibm-pa-tools` endpoint (breaking — the discrete
+      cube-tools/analysis-tools endpoints are removed). Decide wrap-vs-out-of-scope
+      before the next coverage reconcile; MCP is IBM's third PAW API class
+      alongside Workspace APIs and the TM1 proxy.
+- [ ] `TM1ProxyService.get_metrics()` — typed helper for the TM1 Metrics API
+      (`GET {db}/api/v1/Metrics()`, surfaced by IBM's 2.1.22 announcement);
+      already reachable via the generic proxy pass-through, so demand-driven
 - [ ] OAuth authorization-code + refresh-token flow — the only OAuth on-prem
       PAW supports (client-credentials is rejected per IBM Docs)
 - [ ] Async support (`aiohttp`)

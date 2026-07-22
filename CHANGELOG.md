@@ -6,6 +6,19 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+- `content` API group minimum PAW build corrected from `2.1.21` (UNVERIFIED) to
+  the `2.0.0` baseline in `version_requirements.py` and `coverage/COVERAGE.md`
+  (incl. the `/pacontent/v1` rows' `Since PAW` cells): the Content Services API
+  is the legacy pre-2.1.21 surface per IBM's reference, and 0.4.1's live
+  validation confirmed it works on a 2.0.x build. Version gating no longer
+  wrongly blocks `ContentService` on pre-2.1.21 deployments with a detected
+  PAW version.
+- Roadmap: MCP scope decision queued for PAW 2.1.22 (unified `/ibm-pa-tools`
+  endpoint, breaking) and an optional typed `TM1ProxyService.get_metrics()`
+  helper (TM1 Metrics API), per the 2026-07-22 PAW REST API research
+  assessment.
+
 ## [0.4.1] - 2026-07-20
 
 ### Changed

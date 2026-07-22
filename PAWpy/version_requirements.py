@@ -39,7 +39,7 @@ MIN_PAW_VERSION: Dict[str, str] = {
     "ui":           BASELINE_PAW_VERSION,  # /ui embed-URL builder
     "tm1-proxy":    BASELINE_PAW_VERSION,  # /api/v0/tm1/<db>/api/v1 proxy (legacy path)
     "admin":        BASELINE_PAW_VERSION,  # /api/v1/admin
-    "content":      "2.1.21",              # /pacontent/v1 Content Services API  # UNVERIFIED — confirm vs IBM release notes
+    "content":      BASELINE_PAW_VERSION,  # /pacontent/v1 Content Services API — CONFIRMED 2.0-era: live-validated on a 2.0.x build (2026-07-20, see CHANGELOG 0.4.1) and IBM's reference (ibm.github.io/pacontentservicesapi) documents it as the legacy pre-2.1.21 surface
     "tm1-proxy-v1": "2.1.21",              # /api/v1/tm1/<db>/api/v1 proxy — CONFIRMED: IBM Docs + IBM Community announcement (REST API introduced 2.1.21/3.1.8)
     "content-v1":   "2.1.21",              # /api/v1/content assets/users/groups — CONFIRMED: same sources; collection folder "new in 2.1.21 & 3.1.8"
 }

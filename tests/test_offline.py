@@ -154,15 +154,19 @@ def test_version_meets():
 
 
 def test_min_version_for_known_and_default():
-    assert min_version_for("content") == "2.1.21"
+    # legacy /pacontent/v1 is baseline-gated (live-validated on a 2.0.x build)
+    assert min_version_for("content") == "2.0.0"
+    assert min_version_for("content-v1") == "2.1.21"
     assert min_version_for("nonexistent-group") == BASELINE_PAW_VERSION
 
 
 def test_is_supported_unknown_version_is_permissive():
     # Unknown server version -> PAWpy does not block.
-    assert is_supported("content", None) is True
-    assert is_supported("content", "2.1.20") is False
-    assert is_supported("content", "2.1.21") is True
+    assert is_supported("content-v1", None) is True
+    assert is_supported("content-v1", "2.1.20") is False
+    assert is_supported("content-v1", "2.1.21") is True
+    # legacy content group works on 2.0-era builds
+    assert is_supported("content", "2.0.0") is True
 
 
 def test_min_version_per_release_line():
@@ -222,21 +226,23 @@ def test_paw_service_version_gating():
     paw = make_paw()
     # No version set -> permissive.
     assert paw.paw_version is None
-    assert paw.supports("content") is True
-    paw.assert_supported("content")  # no-op
+    assert paw.supports("content-v1") is True
+    paw.assert_supported("content-v1")  # no-op
 
-    assert paw.requires("content") == "2.1.21"
+    assert paw.requires("content-v1") == "2.1.21"
 
     # Too-old version -> supports() False and assert raises.
     paw.paw_version = "2.1.20"
-    assert paw.supports("content") is False
+    assert paw.supports("content-v1") is False
     with pytest.raises(PAWVersionError):
-        paw.assert_supported("content")
+        paw.assert_supported("content-v1")
+    # ...but the legacy content group is baseline-gated and stays supported.
+    assert paw.supports("content") is True
 
     # New enough -> supported again.
     paw.paw_version = "2.1.21"
-    assert paw.supports("content") is True
-    paw.assert_supported("content")
+    assert paw.supports("content-v1") is True
+    paw.assert_supported("content-v1")
 
 
 def test_paw_version_constructor_arg():
