@@ -6,6 +6,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-09-18
+
 ### Added
 - `DatabaseService` (`paw.databases`) — the `/api/v1/databases` administration
   API from IBM's Postman collection folder "Databases (2.1.24 & 3.1.11)":
@@ -141,7 +143,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Typed exception hierarchy (`PAWException` and subclasses).
 - 14 offline tests covering URL building, OData/path encoding, and config validation.
 
-[Unreleased]: https://github.com/bluestarleo/PAWpy/compare/v0.4.1...HEAD
+[Unreleased]: https://github.com/bluestarleo/PAWpy/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/bluestarleo/PAWpy/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/bluestarleo/PAWpy/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/bluestarleo/PAWpy/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/bluestarleo/PAWpy/compare/v0.2.0...v0.3.0
