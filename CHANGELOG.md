@@ -6,7 +6,47 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+- `DatabaseService` (`paw.databases`) — the `/api/v1/databases` administration
+  API from IBM's Postman collection folder "Databases (2.1.24 & 3.1.11)":
+  list databases; start / stop / force-stop (`endProcess`) / restart; TM1 12
+  database create / delete; manual & automatic backup list, create, download,
+  delete. New API group `databases` (min PAW 2.1.24 / 3.1.11, **UNVERIFIED**:
+  pre-release at reconcile time — IBM Docs' latest GA What's new was 2.1.23).
+  Base path overridable via `PAWService(databases_base=...)`.
+- `UserAdminService` (`paw.user_admin`) — the write-capable `/api/v1/useradmin`
+  API (collection folder "User admin (2.1.25 & 3.1.12)"): user CRUD, profile /
+  roles / groups / environments per user, bulk role & state changes, CSV
+  export/import; group CRUD (create / replace / patch / delete, bulk delete),
+  membership add/remove, CSV export, bulk add; roles, quota, environments,
+  copy/remove users across environments. New API group `useradmin` (min PAW
+  2.1.25 / 3.1.12, **UNVERIFIED**). Base path overridable via
+  `PAWService(useradmin_base=...)`.
+- `CloudAdminService` (`paw.cloud_admin`) — the **PA on Cloud (SaaS) only**
+  `/api/v1/cloudadmin` API (collection folder "PA on Cloud Admin (2.1.24 &
+  3.1.11)"): subscription details / list / per-user, add users to and revoke
+  subscriptions, invite one or many users. New API group `cloudadmin` (min PAW
+  2.1.24 / 3.1.11, **UNVERIFIED**; cannot be live-validated on-prem). Base
+  path overridable via `PAWService(cloudadmin_base=...)`.
+- `TM1ProxyService.get_metrics(cube=None, database_only=False, filter=None)`
+  — typed helper for the TM1 Metrics API (`GET {db}/api/v1/Metrics()`, the
+  endpoint IBM's PAW 2.1.22 "What's coming next" page cites for the Agent MCP
+  metrics tool), with `$filter` shortcuts for one cube or database-level rows.
+- `PAWpy.Services` now also exports `ContentV1Service`, `UserGroupService`,
+  `DatabaseService`, `UserAdminService`, `CloudAdminService`.
+- Offline tests for the new services' wiring, base overrides, version gating,
+  backup-type validation and the metrics `$filter` shortcuts.
+
 ### Changed
+- Coverage reconciled 2026-09-18 against IBM's Postman collection rev
+  51028184402 (updated 2026-09-01; was 49790523243): 50 new endpoints, all
+  triaged and wrapped (one `partial`: `POST /useradmin/groups/bulk`, whose
+  payload IBM's example leaves empty). No MCP requests in the collection and
+  still no official Swagger/OpenAPI page — the MCP scope decision stays open.
+  IBM Docs' REST API overview now lists MCP as PAW's third API class; the
+  2.1.22 release (26 June 2026) consolidated all Planning Analytics Agent MCP
+  tools under the unified `/ibm-pa-tools` endpoint and removed the discrete
+  cube-tools/analysis-tools endpoints.
 - `content` API group minimum PAW build corrected from `2.1.21` (UNVERIFIED) to
   the `2.0.0` baseline in `version_requirements.py` and `coverage/COVERAGE.md`
   (incl. the `/pacontent/v1` rows' `Since PAW` cells): the Content Services API

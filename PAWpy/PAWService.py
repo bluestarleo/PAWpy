@@ -22,11 +22,14 @@ from typing import Dict, Optional
 
 from PAWpy.Services.AdminService import AdminService, DEFAULT_ADMIN_BASE
 from PAWpy.Services.BookService import BookService
+from PAWpy.Services.CloudAdminService import CloudAdminService, DEFAULT_CLOUDADMIN_BASE
 from PAWpy.Services.ContentService import ContentService, DEFAULT_CONTENT_BASE
 from PAWpy.Services.ContentV1Service import ContentV1Service, DEFAULT_CONTENT_V1_BASE
+from PAWpy.Services.DatabaseService import DatabaseService, DEFAULT_DATABASES_BASE
 from PAWpy.Services.RestService import RestService
 from PAWpy.Services.TM1ProxyService import PROXY_PREFIX, TM1ProxyService
 from PAWpy.Services.UIService import UIService
+from PAWpy.Services.UserAdminService import UserAdminService, DEFAULT_USERADMIN_BASE
 from PAWpy.Services.UserGroupService import UserGroupService
 from PAWpy.Services.ViewService import ViewService
 from PAWpy.version_requirements import (
@@ -46,6 +49,9 @@ class PAWService:
         content_v1_base: str = DEFAULT_CONTENT_V1_BASE,
         admin_base: str = DEFAULT_ADMIN_BASE,
         tm1_proxy_base: str = PROXY_PREFIX,
+        databases_base: str = DEFAULT_DATABASES_BASE,
+        useradmin_base: str = DEFAULT_USERADMIN_BASE,
+        cloudadmin_base: str = DEFAULT_CLOUDADMIN_BASE,
         paw_version: Optional[str] = None,
         **rest_kwargs,
     ):
@@ -63,6 +69,12 @@ class PAWService:
             legacy ``/api/v0/tm1``; pass
             :data:`~PAWpy.Services.TM1ProxyService.PROXY_PREFIX_V1`
             (``/api/v1/tm1``) on PAW 2.1.21+ / 3.1.8+ (the OAuth-era API).
+        :param databases_base: base path of the database admin API
+            (``/api/v1/databases``, PAW 2.1.24+/3.1.11+ — :attr:`databases`).
+        :param useradmin_base: base path of the user admin API
+            (``/api/v1/useradmin``, PAW 2.1.25+/3.1.12+ — :attr:`user_admin`).
+        :param cloudadmin_base: base path of the PA on Cloud subscription admin
+            API (``/api/v1/cloudadmin``, SaaS only — :attr:`cloud_admin`).
         :param paw_version: the connected PAW build version (e.g. ``"2.1.21"``).
             Optional — set it (or call :meth:`detect_paw_version`) to enable
             :meth:`supports` / :meth:`assert_supported` version gating. When
@@ -84,6 +96,12 @@ class PAWService:
         self.books = BookService(self._rest, self.content, self.ui)
         self.views = ViewService(self._rest, self.content, self.ui)
         self.admin = AdminService(self._rest, admin_base=admin_base)
+
+        # Administration surfaces added to IBM's collection for the 2.1.24/3.1.11
+        # and 2.1.25/3.1.12 releases (version-gated via their API_GROUPs).
+        self.databases = DatabaseService(self._rest, databases_base=databases_base)
+        self.user_admin = UserAdminService(self._rest, useradmin_base=useradmin_base)
+        self.cloud_admin = CloudAdminService(self._rest, cloudadmin_base=cloudadmin_base)
 
         # Cache of per-database TM1 proxy services.
         self._tm1_cache: Dict[str, TM1ProxyService] = {}
@@ -151,7 +169,8 @@ class PAWService:
     def requires(self, api_group: str) -> str:
         """Minimum PAW build required for *api_group* (``"content"``, ``"admin"``,
         ``"ui"``, ``"auth"``, ``"tm1-proxy"``, ``"tm1-proxy-v1"``,
-        ``"content-v1"``). Mirrors a service's ``API_GROUP``. When
+        ``"content-v1"``, ``"databases"``, ``"useradmin"``, ``"cloudadmin"``).
+        Mirrors a service's ``API_GROUP``. When
         :attr:`paw_version` is known, the minimum for its release line is
         returned (IBM ships features to 2.x and 3.x at different builds).
         """

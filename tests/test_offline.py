@@ -14,6 +14,9 @@ from PAWpy.Services.UIService import UIService
 from PAWpy.Services.TM1ProxyService import TM1ProxyService, PROXY_PREFIX_V1
 from PAWpy.Services.ContentV1Service import ContentV1Service
 from PAWpy.Services.UserGroupService import UserGroupService
+from PAWpy.Services.DatabaseService import DatabaseService
+from PAWpy.Services.UserAdminService import UserAdminService
+from PAWpy.Services.CloudAdminService import CloudAdminService
 from PAWpy.Utils.Utils import odata_query, encode_path_twice, odata_value_list
 from PAWpy.version_requirements import (
     parse_version,
@@ -250,6 +253,82 @@ def test_paw_version_constructor_arg():
                      csrf_token="x", connect=False, paw_version="2.1.21")
     assert paw.paw_version == "2.1.21"
     assert paw.supports("content") is True
+
+
+# --------------------------- 2.1.24 / 2.1.25 admin surfaces --------------- #
+def test_admin_surfaces_wired_and_gated():
+    paw = make_paw()
+    assert isinstance(paw.databases, DatabaseService)
+    assert isinstance(paw.user_admin, UserAdminService)
+    assert isinstance(paw.cloud_admin, CloudAdminService)
+    assert paw.databases._base == "/api/v1/databases"
+    assert paw.user_admin._base == "/api/v1/useradmin"
+    assert paw.cloud_admin._base == "/api/v1/cloudadmin"
+    assert DatabaseService.API_GROUP == "databases"
+    assert UserAdminService.API_GROUP == "useradmin"
+    assert CloudAdminService.API_GROUP == "cloudadmin"
+
+    # Per-line minimums: 2.1.24 & 3.1.11 (databases / cloudadmin), 2.1.25 & 3.1.12 (useradmin).
+    assert paw.requires("databases") == "2.1.24"
+    assert min_version_for("databases", "3.1.0") == "3.1.11"
+    assert min_version_for("useradmin", "3.1.0") == "3.1.12"
+    paw.paw_version = "2.1.23"          # latest GA at reconcile time -> none supported
+    assert paw.supports("databases") is False
+    assert paw.supports("useradmin") is False
+    assert paw.supports("cloudadmin") is False
+    paw.paw_version = "2.1.24"
+    assert paw.supports("databases") is True
+    assert paw.supports("cloudadmin") is True
+    assert paw.supports("useradmin") is False
+    paw.paw_version = "3.1.12"
+    assert paw.supports("useradmin") is True
+    with pytest.raises(PAWVersionError):
+        assert_supported("useradmin", "3.1.11")
+
+
+def test_admin_surfaces_base_override():
+    paw = PAWService(host="paw.test.local", auth_mode="session", csrf_token="x",
+                     connect=False, databases_base="/x/db", useradmin_base="/x/ua",
+                     cloudadmin_base="/x/ca")
+    assert paw.databases._base == "/x/db"
+    assert paw.user_admin._base == "/x/ua"
+    assert paw.cloud_admin._base == "/x/ca"
+
+
+def test_database_backup_type_validation():
+    paw = make_paw()
+    assert DatabaseService._backup_type("manual") == "MANUAL"
+    assert DatabaseService._backup_type("AUTO") == "AUTO"
+    with pytest.raises(ValueError):
+        paw.databases.get_backups("db", "weekly")
+
+
+def test_user_admin_add_user_to_group_requires_identifier():
+    paw = make_paw()
+    with pytest.raises(ValueError):
+        paw.user_admin.add_user_to_group("g1")
+
+
+def test_tm1_proxy_get_metrics_filters(monkeypatch):
+    paw = make_paw()
+    tm1 = paw.tm1("Planning Sample")
+    calls = []
+
+    def fake_get(path, params=None):
+        calls.append((path, params))
+        return {"value": [{"CubeName": None}]}
+
+    monkeypatch.setattr(tm1, "get", fake_get)
+    assert tm1.get_metrics() == [{"CubeName": None}]
+    tm1.get_metrics(cube="Cube A")
+    tm1.get_metrics(database_only=True)
+    tm1.get_metrics(cube="Cube A", filter="(Foo eq 1)")
+    assert calls == [
+        ("Metrics()", None),
+        ("Metrics()", {"$filter": "(CubeName eq 'Cube A')"}),
+        ("Metrics()", {"$filter": "(CubeName eq null)"}),
+        ("Metrics()", {"$filter": "(Foo eq 1)"}),
+    ]
 
 
 # --------------------------- config validation --------------------------- #

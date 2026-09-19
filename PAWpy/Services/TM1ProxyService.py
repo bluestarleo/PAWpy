@@ -99,6 +99,37 @@ class TM1ProxyService(ObjectService):
         return odata_value_list(self.get(f"Cubes('{cube}')/{scope}"))
 
     # ------------------------------------------------------------------ #
+    # Metrics (TM1 Metrics API — ``GET {db}/api/v1/Metrics()``)
+    # ------------------------------------------------------------------ #
+    def get_metrics(
+        self,
+        cube: Optional[str] = None,
+        *,
+        database_only: bool = False,
+        filter: Optional[str] = None,
+    ) -> List[Dict[str, Any]]:
+        """Read performance / resource metrics via the TM1 Metrics API.
+
+        Surfaced by IBM's PAW 2.1.22 "What's coming next" page (the Planning
+        Analytics Agent MCP tool calls ``GET {{databaseRoot}}/Metrics()``) and
+        present in IBM's Postman collection ("TM1 / Metrics"). Requires a TM1
+        database version that implements ``Metrics()``.
+
+        * no arguments — every metric row (database + per-cube)
+        * ``cube="Cube A"`` — that cube's rows (``$filter=(CubeName eq 'Cube A')``)
+        * ``database_only=True`` — database-level rows (``CubeName eq null``)
+        * ``filter="..."`` — a raw OData ``$filter`` expression (wins over the
+          two shortcuts)
+        """
+        if filter is None:
+            if cube is not None:
+                filter = f"(CubeName eq '{cube}')"
+            elif database_only:
+                filter = "(CubeName eq null)"
+        params = {"$filter": filter} if filter else None
+        return odata_value_list(self.get("Metrics()", params=params))
+
+    # ------------------------------------------------------------------ #
     # MDX
     # ------------------------------------------------------------------ #
     def execute_mdx(self, mdx: str) -> Dict[str, Any]:

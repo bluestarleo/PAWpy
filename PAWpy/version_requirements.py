@@ -42,6 +42,9 @@ MIN_PAW_VERSION: Dict[str, str] = {
     "content":      BASELINE_PAW_VERSION,  # /pacontent/v1 Content Services API — CONFIRMED 2.0-era: live-validated on a 2.0.x build (2026-07-20, see CHANGELOG 0.4.1) and IBM's reference (ibm.github.io/pacontentservicesapi) documents it as the legacy pre-2.1.21 surface
     "tm1-proxy-v1": "2.1.21",              # /api/v1/tm1/<db>/api/v1 proxy — CONFIRMED: IBM Docs + IBM Community announcement (REST API introduced 2.1.21/3.1.8)
     "content-v1":   "2.1.21",              # /api/v1/content assets/users/groups — CONFIRMED: same sources; collection folder "new in 2.1.21 & 3.1.8"
+    "databases":    "2.1.24",              # /api/v1/databases — UNVERIFIED (pre-release): IBM Postman collection folder "Databases (2.1.24 & 3.1.11)" + IBM Community thread Sept-2026 update ("database management" endpoints in the September releases); latest GA documented by IBM Docs at reconcile time (2026-09-18) was 2.1.23
+    "cloudadmin":   "2.1.24",              # /api/v1/cloudadmin (PA on Cloud only) — UNVERIFIED (pre-release): collection folder "PA on Cloud Admin (2.1.24 & 3.1.11)"
+    "useradmin":    "2.1.25",              # /api/v1/useradmin — UNVERIFIED (pre-release): collection folder "User admin (2.1.25 & 3.1.12)" + IBM Community thread ("users, groups" endpoints)
 }
 
 # IBM ships PAW on two release lines at once (e.g. "new in 2.1.21 & 3.1.8"), so
@@ -52,6 +55,9 @@ MIN_PAW_VERSION: Dict[str, str] = {
 MIN_PAW_VERSION_BY_LINE: Dict[str, Dict[int, str]] = {
     "tm1-proxy-v1": {2: "2.1.21", 3: "3.1.8"},
     "content-v1":   {2: "2.1.21", 3: "3.1.8"},
+    "databases":    {2: "2.1.24", 3: "3.1.11"},   # UNVERIFIED (pre-release)
+    "cloudadmin":   {2: "2.1.24", 3: "3.1.11"},   # UNVERIFIED (pre-release)
+    "useradmin":    {2: "2.1.25", 3: "3.1.12"},   # UNVERIFIED (pre-release)
 }
 
 

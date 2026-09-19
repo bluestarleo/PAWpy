@@ -44,13 +44,27 @@ PAWService                  ← top-level entry point (mirrors TM1py's TM1Servic
 ├── BookService             ← books (type=book/dashboard) over ContentService
 ├── ViewService             ← views over ContentService
 ├── AdminService            ← /api/v1/admin  (servers, users, groups)
+├── DatabaseService         ← /api/v1/databases  (list, start/stop/restart, TM1 12
+│                             create/delete + backups — PAW 2.1.24+/3.1.11+)
+├── UserAdminService        ← /api/v1/useradmin  (user & group CRUD, roles, states,
+│                             CSV import/export, environments — PAW 2.1.25+/3.1.12+)
+├── CloudAdminService       ← /api/v1/cloudadmin  (PA on Cloud subscriptions &
+│                             invitations — SaaS only, PAW 2.1.24+/3.1.11+)
 ├── UIService               ← URL builder for /ui?type=… embed endpoints
 └── TM1ProxyService         ← /api/v0/tm1/<db>/api/v1/…  (TM1 REST via PAW auth;
                               pass tm1_proxy_base="/api/v1/tm1" on PAW 2.1.21+/3.1.8+)
 ```
 
-All base paths (`content_base`, `admin_base`) are constructor-overridable, since
-they vary across PAW builds (`/pacontent/v1` vs `/api/v1/content`).
+All base paths (`content_base`, `content_v1_base`, `admin_base`,
+`databases_base`, `useradmin_base`, `cloudadmin_base`, `tm1_proxy_base`) are
+constructor-overridable, since they vary across PAW builds (`/pacontent/v1`
+vs `/api/v1/content`).
+
+> **Pre-release surfaces.** `DatabaseService`, `UserAdminService` and
+> `CloudAdminService` wrap folders that IBM's Postman collection tags for PAW
+> 2.1.24/3.1.11 and 2.1.25/3.1.12. At the time of writing IBM's latest GA
+> "What's new" was 2.1.23, so these version pins are marked UNVERIFIED in
+> `version_requirements.py` until IBM publishes the release notes.
 
 ## Auth Modes
 
@@ -106,6 +120,17 @@ with PAWService(
     # TM1 proxy call (MDX via PAW auth) — returns the raw cellset JSON
     tm1 = paw.tm1("Planning Sample")
     data = tm1.execute_mdx("SELECT {[Account].[Revenue]} ON 0 FROM [Revenue Cube]")
+    stats = tm1.get_metrics(cube="plan_BudgetPlan")   # TM1 Metrics API via the proxy
+
+    # Database admin (PAW 2.1.24+/3.1.11+): the PAA "database details" buttons
+    dbs = paw.databases.get_all()
+    paw.databases.restart("Planning Sample")
+    backups = paw.databases.get_backups("Planning Sample", "MANUAL")   # TM1 12 only
+
+    # User admin (PAW 2.1.25+/3.1.12+): write-capable users & groups
+    roles = paw.user_admin.get_roles()
+    grp   = paw.user_admin.create_group("Finance Modelers", role_name="Modeler")
+    paw.user_admin.add_user_to_group(grp["id"], login_id="jdoe")
 
     # Embed URL generation (no HTTP call)
     embed = paw.ui.cube_viewer_url("Planning Sample", "plan_BudgetPlan", view="Budget Input")
@@ -185,19 +210,24 @@ entries in `CHANGELOG.md` and Roadmap items below.
 - [x] Content API v1 (`/api/v1/content`, PAW 2.1.21+/3.1.8+) — `ContentV1Service`:
       assets incl. content retrieval, permissions (get/set/effective),
       bulk copy/move/delete/permissions, asset types
-- [x] `UserGroupService` — PAW users/groups reads (`/api/v1/content/users|groups`);
-      write endpoints not yet documented by IBM
+- [x] `UserGroupService` — PAW users/groups reads (`/api/v1/content/users|groups`)
+- [x] `UserAdminService` — write-capable users & groups (`/api/v1/useradmin`,
+      collection folder "User admin (2.1.25 & 3.1.12)")
+- [x] `DatabaseService` — database lifecycle + TM1 12 backups (`/api/v1/databases`,
+      "Databases (2.1.24 & 3.1.11)")
+- [x] `CloudAdminService` — PA on Cloud subscriptions/invitations (`/api/v1/cloudadmin`)
+- [x] `TM1ProxyService.get_metrics()` — typed helper for the TM1 Metrics API
+      (`GET {db}/api/v1/Metrics()`)
+- [ ] Live-validate the 2.1.24 / 2.1.25 surfaces once a GA build is available and
+      drop the UNVERIFIED markers
 - [ ] `ViewService` — PAW view CRUD
 - [ ] `EmbedTokenService` — generate scoped embed tokens
-- [ ] `MCPService` — PAW MCP endpoint integration. **Scope decision needed when
-      PAW 2.1.22 ships**: IBM consolidates all Planning Analytics Agent MCP
-      tools under a unified `/ibm-pa-tools` endpoint (breaking — the discrete
-      cube-tools/analysis-tools endpoints are removed). Decide wrap-vs-out-of-scope
-      before the next coverage reconcile; MCP is IBM's third PAW API class
+- [ ] `MCPService` — PAW MCP endpoint integration. **Scope decision still open**:
+      PAW 2.1.22 (26 June 2026) consolidated all Planning Analytics Agent MCP
+      tools under the unified `/ibm-pa-tools` endpoint and removed the discrete
+      cube-tools/analysis-tools endpoints. IBM's Postman collection carries no
+      MCP requests yet, so nothing to diff; MCP is IBM's third PAW API class
       alongside Workspace APIs and the TM1 proxy.
-- [ ] `TM1ProxyService.get_metrics()` — typed helper for the TM1 Metrics API
-      (`GET {db}/api/v1/Metrics()`, surfaced by IBM's 2.1.22 announcement);
-      already reachable via the generic proxy pass-through, so demand-driven
 - [ ] OAuth authorization-code + refresh-token flow — the only OAuth on-prem
       PAW supports (client-credentials is rejected per IBM Docs)
 - [ ] Async support (`aiohttp`)
